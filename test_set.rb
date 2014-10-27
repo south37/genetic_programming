@@ -6,15 +6,15 @@ class TestSet
     @test_set    = build_test_set
   end
 
-  def param_size
-    @hidden_proc.arity
-  end
-
   def build_test_set
     [*0..200].map do |i|
       params = Array.new(param_size) { rand(40) }
       [params, @hidden_proc.call(*params)]
     end
+  end
+
+  def param_size
+    @hidden_proc.arity
   end
 
   def score(tree)
