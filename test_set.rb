@@ -6,17 +6,20 @@ class TestSet
     @test_set    = build_test_set
   end
 
+  def param_size
+    @hidden_proc.arity
+  end
+
   def build_test_set
     [*0..200].map do |i|
-      x = rand(40)
-      y = rand(40)
-      [x, y, @hidden_proc.call(x, y)]
+      params = Array.new(param_size) { rand(40) }
+      [params, @hidden_proc.call(*params)]
     end
   end
 
   def get_score(tree)
-    @test_set.map { |x, y, test_value|
-      (tree.eval(x, y) - test_value).abs
+    @test_set.map { |params, test_value|
+      (tree.eval(*params) - test_value).abs
     }.reduce(:+)
   end
 end
