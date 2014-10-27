@@ -1,5 +1,5 @@
 require_relative './func_list'
-require_relative './node'
+require_relative './tree'
 
 module GeneticProgramming
   class Solver
