@@ -6,7 +6,7 @@ module GeneticProgramming
       end
 
       def have_children?
-        false
+        self.class.method_defined?(:children)
       end
 
       def mutate(param_size, change_prob = 0.1)
@@ -89,10 +89,6 @@ module GeneticProgramming
       def eval(*params)
         results = @children.map { |e| e.eval(*params) }
         @func.call(*results)
-      end
-
-      def have_children?
-        true
       end
 
       def name
