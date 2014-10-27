@@ -26,6 +26,6 @@ end
 
 if __FILE__ == $0
   test_set = TestSet.new(lambda { |x, y| x ** 2 + 3 * y })
-  GeneticProgramming::Solver.new(test_set).evolve(2, 500)
+  GeneticProgramming::Solver.new(test_set).evolve(500)
 end
 

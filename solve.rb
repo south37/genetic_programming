@@ -16,32 +16,29 @@ module GeneticProgramming
       Math.log(Math.log(rand) / Math.log(@p_exp)).to_i
     end
 
-    def evolve(param_size, pop_size)
-      population = Array.new(pop_size) { |i| make_random_tree(param_size) }
-      scores = []
+    def evolve(pop_size)
+      population = Array.new(pop_size) { make_random_tree(@score_obj.param_size) }
+      tree_with_score = []
       @max_gen.times do |count|
-        scores = rank_func(population)
-        p scores[0][0]
-        break if scores[0][0] == 0
+        tree_with_score = population.map { |tree| {tree: tree, score: @score_obj.get_score(tree)} }
+                                    .sort_by { |tws| tws[:score] }
+        p tree_with_score.first[:score]
+        break if tree_with_score.first[:score] == 0
 
-        population[0] = scores[0][1]
-        population[1] = scores[1][1]
+        population[0] = tree_with_score[0][:tree]
+        population[1] = tree_with_score[1][:tree]
         (2..pop_size).each do |i|
           if rand > @p_new
-            tree1 = scores[select_index][1]
-            tree2 = scores[select_index][1]
-            population[i] = mutate(crossover(tree1, tree2, @crossover_rate), param_size, @mutate_rate)
+            tree1 = tree_with_score[select_index][:tree]
+            tree2 = tree_with_score[select_index][:tree]
+            population[i] = mutate(crossover(tree1, tree2, @crossover_rate), @score_obj.param_size, @mutate_rate)
           else
-            population[i] = make_random_tree(param_size)
+            population[i] = make_random_tree(@score_obj.param_size)
           end
         end
       end
-      scores[0][1].display
-      scores[0][1]
-    end
-
-    def rank_func(population)
-      population.map { |tree| [@score_obj.get_score(tree), tree] }.sort_by { |score, tree| score }
+      tree_with_score.first[:tree].display
+      tree_with_score.first[:tree]
     end
 
     def make_random_tree(param_size, max_depth = 4, f_prob = 0.5, p_prob = 0.6)
