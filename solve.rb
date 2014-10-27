@@ -10,36 +10,41 @@ module GeneticProgramming
       @crossover_rate = crossover_rate
       @exp_prob       = exp_prob
       @new_prob       = new_prob
+
+      @tree_with_scores = []
+    end
+
+    def evolve(pop_size)
+      population = Array.new(pop_size) { Tree.make_random_tree(@score_obj.param_size) }
+      @max_gen.times do
+        @tree_with_scores = population
+          .map { |tree| {tree: tree, score: @score_obj.score(tree)} }
+          .sort_by { |tws| tws[:score] }
+        p @tree_with_scores.first[:score]
+        break if @tree_with_scores.first[:score] == 0
+
+        population[0] = @tree_with_scores[0][:tree]
+        population[1] = @tree_with_scores[1][:tree]
+        (2..pop_size).each do |i|
+          if rand > @new_prob
+            population[i] = select_tree
+              .crossover(select_tree, @crossover_rate)
+              .mutate(@score_obj.param_size, @mutate_rate)
+          else
+            population[i] = Tree.make_random_tree(@score_obj.param_size)
+          end
+        end
+      end
+      @tree_with_scores.first[:tree].display
+      @tree_with_scores.first[:tree]
     end
 
     def select_index
       Math.log(Math.log(rand) / Math.log(@exp_prob)).to_i
     end
 
-    def evolve(pop_size)
-      population = Array.new(pop_size) { Tree.make_random_tree(@score_obj.param_size) }
-      tree_with_score = []
-      @max_gen.times do |count|
-        tree_with_score = population.map { |tree| {tree: tree, score: @score_obj.score(tree)} }
-                                    .sort_by { |tws| tws[:score] }
-        p tree_with_score.first[:score]
-        break if tree_with_score.first[:score] == 0
-
-        population[0] = tree_with_score[0][:tree]
-        population[1] = tree_with_score[1][:tree]
-        (2..pop_size).each do |i|
-          if rand > @new_prob
-            tree1 = tree_with_score[select_index][:tree]
-            tree2 = tree_with_score[select_index][:tree]
-            population[i] = tree1.crossover(tree2, @crossover_rate)
-                                 .mutate(@score_obj.param_size, @mutate_rate)
-          else
-            population[i] = Tree.make_random_tree(@score_obj.param_size)
-          end
-        end
-      end
-      tree_with_score.first[:tree].display
-      tree_with_score.first[:tree]
+    def select_tree
+      @tree_with_scores[select_index][:tree]
     end
   end
 end
