@@ -106,11 +106,11 @@ module GeneticProgramming
         childs = Array.new(func.arity) do
           make_random_tree(param_size, max_depth - 1, f_prob, p_prob)
         end
-        self::EvalNode.new(func, *childs)
+        EvalNode.new(func, *childs)
       elsif rand < p_prob
-        self::ParamLeaf.new(rand(param_size))
+        ParamLeaf.new(rand(param_size))
       else
-        self::ConstLeaf.new(rand(10))
+        ConstLeaf.new(rand(10))
       end
     end
   end
@@ -119,8 +119,12 @@ end
 if __FILE__ == $0
   require_relative './func_list'
 
-  tree = EvalNode.new(FuncList[:add], ConstLeaf.new(1), ConstLeaf.new(2))
-  p tree.eval
-  tree.display
+  module GeneticProgramming
+    tree = Tree::EvalNode.new(
+      FuncList[:add], Tree::ConstLeaf.new(1), Tree::ConstLeaf.new(2)
+    )
+    p tree.eval
+    tree.display
+  end
 end
 
