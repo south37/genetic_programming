@@ -8,6 +8,34 @@ module GeneticProgramming
       def have_children?
         false
       end
+
+      def mutate(param_size, change_prob = 0.1)
+        if rand < change_prob
+          Tree.make_random_tree(param_size)
+        else
+          result = self.dup
+          if self.have_children?
+            result.children = self.children.map do |child|
+              child.mutate(param_size, change_prob)
+            end
+          end
+          result
+        end
+      end
+
+      def crossover(other, swap_prob = 0.7, top = true)
+        if rand < swap_prob && !top
+          other.dup
+        else
+          result = self.dup
+          if self.have_children? && other.have_children?
+            result.children = self.children.map do |child|
+              child.crossover(other.children.sample, swap_prob, false)
+            end
+          end
+          result
+        end
+      end
     end
 
     class ParamLeaf < Node
@@ -83,34 +111,6 @@ module GeneticProgramming
         self::ParamLeaf.new(rand(param_size))
       else
         self::ConstLeaf.new(rand(10))
-      end
-    end
-
-    def self.mutate(tree, param_size, change_prob = 0.1)
-      if rand < change_prob
-        make_random_tree(param_size)
-      else
-        result = tree.dup
-        if tree.have_children?
-          result.children = tree.children.map do |child|
-            mutate(child, param_size, change_prob)
-          end
-        end
-        result
-      end
-    end
-
-    def self.crossover(tree1, tree2, swap_prob = 0.7, top = true)
-      if rand < swap_prob && !top
-        tree2.dup
-      else
-        result = tree1.dup
-        if tree1.have_children? && tree2.have_children?
-          result.children = tree1.children.map do |child|
-            crossover(child, tree2.children.sample, swap_prob, false)
-          end
-        end
-        result
       end
     end
   end

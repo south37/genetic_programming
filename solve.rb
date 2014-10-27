@@ -31,11 +31,8 @@ module GeneticProgramming
           if rand > @new_prob
             tree1 = tree_with_score[select_index][:tree]
             tree2 = tree_with_score[select_index][:tree]
-            population[i] = Tree.mutate(
-              Tree.crossover(tree1, tree2, @crossover_rate),
-              @score_obj.param_size,
-              @mutate_rate
-            )
+            population[i] = tree1.crossover(tree2, @crossover_rate)
+                                 .mutate(@score_obj.param_size, @mutate_rate)
           else
             population[i] = Tree.make_random_tree(@score_obj.param_size)
           end
