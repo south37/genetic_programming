@@ -17,7 +17,7 @@ class TestSet
     end
   end
 
-  def get_score(tree)
+  def score(tree)
     @test_set.map { |params, test_value|
       (tree.eval(*params) - test_value).abs
     }.reduce(:+)
